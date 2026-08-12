@@ -1,0 +1,44 @@
+# Lower bounds rather than exact pins, so pip installs the newest wheel for
+# whatever interpreter you are on. Exact pins are what caused pydantic-core to
+# try to compile from source on Python 3.14 — there was no cp314 wheel for the
+# pinned version, so pip fell back to building it with Rust.
+#
+# Two dependencies were deliberately removed:
+#   passlib      — imports the stdlib `crypt` module, deleted in Python 3.13.
+#                  bcrypt is used directly instead; it is what passlib called.
+#   python-jose  — effectively unmaintained and drags in ecdsa + rsa.
+#                  PyJWT does the same job and is actively released.
+
+fastapi>=0.115.6
+uvicorn[standard]>=0.34.0
+sqlmodel>=0.0.24
+
+# The [email] extra pulls in email-validator, which pydantic needs for the
+# EmailStr field on the registration model. Without it the app raises at import
+# time, not at request time — the whole API fails to start.
+pydantic[email]>=2.10.4
+
+PyJWT>=2.9.0
+bcrypt>=4.2.0
+python-multipart>=0.0.20
+
+# Database drivers. Both are unused when MEDLY_DATABASE_URL points at SQLite,
+# but having them installed means switching database is a variable change and
+# not a rebuild. PyMySQL rather than mysqlclient because it is pure Python and
+# needs no C toolchain in the image.
+psycopg[binary]>=3.2.0
+PyMySQL>=1.1.0
+
+httpx>=0.28.1
+pytest>=8.3.4
+
+# Medly AI (MEDLY_ASSISTANT_PROVIDER=gemini) needs no extra package. It calls
+# the documented Gemini REST endpoint with httpx, already listed above — one
+# less dependency to install, pin and keep current, and the request shape is
+# small enough that an SDK would only be wrapping a single POST.
+#
+# Optional, deliberately not installed. Imported lazily inside the provider
+# that needs them, so the default path stays dependency-free and a missing
+# package is a clear runtime message rather than a failed deploy.
+#   anthropic     for MEDLY_ASSISTANT_PROVIDER=anthropic
+#   openai        for MEDLY_ASSISTANT_PROVIDER=openai
