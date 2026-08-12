@@ -1,0 +1,59 @@
+# --- the two application repositories ---
+# backend/ and frontend/ are separate git repositories with their own GitHub
+# remotes (medly-backend, medly-frontend), and Railway and Vercel deploy from
+# those. This repository is the umbrella: the README, the deploy notes, the
+# compose file — the things that describe the project rather than build it.
+#
+# Ignored rather than committed because `git add .` here stages them as
+# gitlinks: bare commit pointers, no files. A clone would get two empty
+# directories and no way to fetch what belongs in them.
+/backend/
+/frontend/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- database ---
+# SQLite is the dev store. Never commit one — it contains hashed credentials
+# and would let a stale schema silently override a fresh migration.
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# --- Node / frontend ---
+node_modules/
+dist/
+dist-ssr/
+.vite/
+.vercel/
+*.local
+# Written by `tsc -b`, which runs as part of `npm run build`.
+*.tsbuildinfo
+
+# --- secrets ---
+.env
+.env.*
+!.env.example
+
+# --- editors and OS ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.swp
+
+# --- logs ---
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
